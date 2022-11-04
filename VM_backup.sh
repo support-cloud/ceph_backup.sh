@@ -9,10 +9,10 @@ source open-rc
 
 GET_INSTANCE_NAMEs=$(openstack --insecure server list --all-projects --long | awk 'NR>=4 {print $4}')
 
-## Match the instance name with instance id ##
+## Match instance name and instance id ##
 
 for i in $GET_INSTANCE_NAMEs; do
-    VMID=$(openstack --insecure server list --all-projects --long | grep "$i" | awk '{print $2}');
+    VMID=$(nova --insecure list --all-tenants --status=Active | grep "$i" | awk 'NR<=1 {print $2}')
 
     ## create VM name dir to stored by backup ##
 
@@ -23,11 +23,11 @@ for i in $GET_INSTANCE_NAMEs; do
     for j in $VMID; do
         while IFS='' read -r line; do array+=("$line"); done < <(rbd ls -p vms | grep "$j"_disk)
              for ID in "${array[@]}"; do
-                 for w in $(openstack --insecure server list --all-projects --long | grep "$i" | awk 'NR<=1 {print $6}')
+                 for w in $(nova --insecure list --all-tenants | grep "$i" | awk 'NR<=1 {print $8}')
                  do
                      if [ "$w" == "shutoff" ];
                      then
-                         echo "[INFO] $i is in shutoff state... skipping"
+                         echo "[INFO] $i is in Shutoff state... skipping"
                          break 1
                      elif [ "$ID" == "$j"_disk ] ;
                      then
