@@ -9,7 +9,7 @@ source open-rc
 
 GET_INSTANCE_NAMEs=$(openstack --insecure server list --all-projects --long | awk 'NR>=4 {print $4}')
 
-## Match instance name and instance id ##
+## Match the instance name with instance id ##
 
 for i in $GET_INSTANCE_NAMEs; do
     VMID=$(openstack --insecure server list --all-projects --long | grep "$i" | awk '{print $2}');
@@ -25,9 +25,9 @@ for i in $GET_INSTANCE_NAMEs; do
              for ID in "${array[@]}"; do
                  for w in $(openstack --insecure server list --all-projects --long | grep "$i" | awk 'NR<=1 {print $6}')
                  do
-                     if [ "$w" == "error" ];
+                     if [ "$w" == "shutoff" ];
                      then
-                         echo "[INFO] $i is in error state... skipping"
+                         echo "[INFO] $i is in shutoff state... skipping"
                          break 1
                      elif [ "$ID" == "$j"_disk ] ;
                      then
